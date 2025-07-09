@@ -54,7 +54,7 @@ def get_openai_api_key():
     return OPENAI_API_KEY
 
 
-@st.cache_data
+# @st.cache_data
 def inference(uploaded_file, task):
     with open(f"{save_dir}/input.mp4", "wb") as f:
             f.write(uploaded_file.read())
@@ -64,21 +64,6 @@ def inference(uploaded_file, task):
     
     api_key = get_openai_api_key()
     return transcribe_audio_file(f"{save_dir}/output.wav", task=task.lower(), api_key=api_key)
-
-
-def getSubs(segments: Iterator[dict], format: str, maxLineWidth: int) -> str:
-    segmentStream = StringIO()
-
-    if format == 'vtt':
-        write_vtt(segments, file=segmentStream, maxLineWidth=maxLineWidth)
-    elif format == 'srt':
-        write_srt(segments, file=segmentStream, maxLineWidth=maxLineWidth)
-    else:
-        raise Exception("Unknown format " + format)
-
-    segmentStream.seek(0)
-    return segmentStream.read()
-
 
 
 
@@ -95,29 +80,55 @@ def main():
     if task == "Transcribe":
         if st.button("Transcribe"):
             results = inference(input_file, task)
+            
+            # 调试输出 - 添加安全检查
+            st.write("DEBUG - Results structure:", type(results))
+            st.write("DEBUG - Results length:", len(results))
+            st.write("DEBUG - Results[0] (text):", results[0][:100] + "..." if len(results) > 0 and results[0] else "None")
+            if len(results) > 3:
+                st.write("DEBUG - Results[3] (raw_srt):", results[3][:200] + "..." if results[3] else "None")
+            if len(results) > 4:
+                st.write("DEBUG - Results[4] (raw_json):", results[4][:300] + "..." if results[4] else "None")
+            else:
+                st.error("返回值长度不正确，请清除缓存重试")
+                st.button("清除缓存", on_click=st.cache_data.clear)
+                return
+            
             col3, col4 = st.columns(2)
-            col5, col6, col7 = st.columns(3)
+            col5, col6, col7, col10, col11 = st.columns(5)
             col8, col9 = st.columns(2)
             with col3:
                 st.video(input_file)
                 
             with open("transcript.txt", "w+", encoding='utf8') as f:
-                f.writelines(results[0])
+                f.write(results[0])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.txt"), "rb") as f:
                 datatxt = f.read()
                 
             with open("transcript.vtt", "w+",encoding='utf8') as f:
-                f.writelines(results[1])
+                f.write(results[1])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.vtt"), "rb") as f:
                 datavtt = f.read()
                 
             with open("transcript.srt", "w+",encoding='utf8') as f:
-                f.writelines(results[2])
+                f.write(results[2])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.srt"), "rb") as f:
                 datasrt = f.read()
+
+            with open("transcript_raw.srt", "w+",encoding='utf8') as f:
+                f.write(results[3])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript_raw.srt"), "rb") as f:
+                datarawsrt = f.read()
+
+            with open("transcript_raw.json", "w+",encoding='utf8') as f:
+                f.write(results[4])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript_raw.json"), "rb") as f:
+                datarawjson = f.read()
 
             with col5:
                 st.download_button(label="Download Transcript (.txt)",
@@ -131,6 +142,14 @@ def main():
                 st.download_button(label="Download Transcript (.srt)",
                                     data=datasrt,
                                     file_name="transcript.srt")
+            with col10:
+                st.download_button(label="Download Raw SRT (debug)",
+                                    data=datarawsrt,
+                                    file_name="transcript_raw.srt")
+            with col11:
+                st.download_button(label="Download Raw JSON (debug)",
+                                    data=datarawjson,
+                                    file_name="transcript_raw.json")
             with col8:
                 st.success("You can download the transcript in .srt format, edit it (if you need to) and upload it to YouTube to create subtitles for your video.")
             with col9:
@@ -139,28 +158,40 @@ def main():
         if st.button("Translate to English"):
             results = inference(input_file, task)
             col3, col4 = st.columns(2)
-            col5, col6, col7 = st.columns(3)
+            col5, col6, col7, col10, col11 = st.columns(5)
             col8, col9 = st.columns(2)
             with col3:
                 st.video(input_file)
                 
             with open("transcript.txt", "w+", encoding='utf8') as f:
-                f.writelines(results[0])
+                f.write(results[0])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.txt"), "rb") as f:
                 datatxt = f.read()
                 
             with open("transcript.vtt", "w+",encoding='utf8') as f:
-                f.writelines(results[1])
+                f.write(results[1])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.vtt"), "rb") as f:
                 datavtt = f.read()
                 
             with open("transcript.srt", "w+",encoding='utf8') as f:
-                f.writelines(results[2])
+                f.write(results[2])
                 f.close()
             with open(os.path.join(os.getcwd(), "transcript.srt"), "rb") as f:
                 datasrt = f.read()
+
+            with open("transcript_raw.srt", "w+",encoding='utf8') as f:
+                f.write(results[3])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript_raw.srt"), "rb") as f:
+                datarawsrt = f.read()
+
+            with open("transcript_raw.json", "w+",encoding='utf8') as f:
+                f.write(results[4])
+                f.close()
+            with open(os.path.join(os.getcwd(), "transcript_raw.json"), "rb") as f:
+                datarawjson = f.read()
                 
             with col5:
                 st.download_button(label="Download Transcript (.txt)",
@@ -174,6 +205,14 @@ def main():
                 st.download_button(label="Download Transcript (.srt)",
                                     data=datasrt,
                                     file_name="transcript.srt")
+            with col10:
+                st.download_button(label="Download Raw SRT (debug)",
+                                    data=datarawsrt,
+                                    file_name="transcript_raw.srt")
+            with col11:
+                st.download_button(label="Download Raw JSON (debug)",
+                                    data=datarawjson,
+                                    file_name="transcript_raw.json")
             with col8:
                 st.success("You can download the transcript in .srt format, edit it (if you need to) and upload it to YouTube to create subtitles for your video.")
             with col9:

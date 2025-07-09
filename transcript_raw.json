@@ -1,0 +1,96 @@
+{
+  "text": "All units, this is my arrest! Hold off! Negative, Unit 5C. Need for backup. Do not engage. He's not getting away. You're gonna be okay, kid. Just hold on. Officer Balch, 16 years. What? I said you're looking at 16 years, if you're lucky. But it's your lucky day. You've been given another option. We're willing to expunge your record, erase your sentence. In exchange, you go to one of our off-site prisons and participate in a little social experiment. Anything! I'll do it! Just take me! What the hell? Fresh meat! Ow! That's for my husband! Burn in hell, asshole! Cops like you don't survive these games, ever. But you're my ticket out of here. Congratulations, Leonard Balch. You've made it to Phase 2. It's time to meet the other Cell Blocks.",
+  "language": "english",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 4.0,
+      "text": "All units, this is my arrest! Hold off!"
+    },
+    {
+      "start": 4.0,
+      "end": 8.0,
+      "text": "Negative, Unit 5C. Need for backup. Do not engage."
+    },
+    {
+      "start": 8.0,
+      "end": 11.0,
+      "text": "He's not getting away."
+    },
+    {
+      "start": 16.0,
+      "end": 19.0,
+      "text": "You're gonna be okay, kid. Just hold on."
+    },
+    {
+      "start": 19.0,
+      "end": 22.0,
+      "text": "Officer Balch, 16 years."
+    },
+    {
+      "start": 22.0,
+      "end": 23.0,
+      "text": "What?"
+    },
+    {
+      "start": 23.0,
+      "end": 27.0,
+      "text": "I said you're looking at 16 years, if you're lucky."
+    },
+    {
+      "start": 28.0,
+      "end": 32.0,
+      "text": "But it's your lucky day. You've been given another option."
+    },
+    {
+      "start": 32.0,
+      "end": 35.0,
+      "text": "We're willing to expunge your record, erase your sentence."
+    },
+    {
+      "start": 35.0,
+      "end": 42.0,
+      "text": "In exchange, you go to one of our off-site prisons and participate in a little social experiment."
+    },
+    {
+      "start": 42.0,
+      "end": 46.0,
+      "text": "Anything! I'll do it! Just take me!"
+    },
+    {
+      "start": 49.0,
+      "end": 51.0,
+      "text": "What the hell?"
+    },
+    {
+      "start": 51.0,
+      "end": 53.0,
+      "text": "Fresh meat!"
+    },
+    {
+      "start": 54.0,
+      "end": 56.0,
+      "text": "Ow!"
+    },
+    {
+      "start": 59.0,
+      "end": 63.0,
+      "text": "That's for my husband! Burn in hell, asshole!"
+    },
+    {
+      "start": 63.0,
+      "end": 68.0,
+      "text": "Cops like you don't survive these games, ever. But you're my ticket out of here."
+    },
+    {
+      "start": 75.0,
+      "end": 79.0,
+      "text": "Congratulations, Leonard Balch. You've made it to Phase 2."
+    },
+    {
+      "start": 79.0,
+      "end": 82.0,
+      "text": "It's time to meet the other Cell Blocks."
+    }
+  ]
+}

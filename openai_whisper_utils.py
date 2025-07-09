@@ -2,7 +2,7 @@ import os
 import openai
 from typing import Dict, List, Any
 import json
-from utils import write_vtt, write_srt
+from utils import write_vtt, write_srt, write_raw_srt
 from io import StringIO
 import streamlit as st
 
@@ -82,7 +82,7 @@ def transcribe_with_openai(audio_file_path: str, task: str = "transcribe", langu
     return result
 
 
-def getSubs(segments: List[Dict], format: str, maxLineWidth: int) -> str:
+def getSubs(segments: List[Dict], format: str, maxLineWidth: int = None) -> str:
     """生成字幕文件内容"""
     segmentStream = StringIO()
 
@@ -90,17 +90,20 @@ def getSubs(segments: List[Dict], format: str, maxLineWidth: int) -> str:
         write_vtt(segments, file=segmentStream, maxLineWidth=maxLineWidth)
     elif format == 'srt':
         write_srt(segments, file=segmentStream, maxLineWidth=maxLineWidth)
+    elif format == 'raw_srt':
+        write_raw_srt(segments, file=segmentStream)
     else:
         raise Exception("Unknown format " + format)
 
     segmentStream.seek(0)
-    return segmentStream.read()
+    result = segmentStream.read()
+    return result
 
 
 def transcribe_audio_file(audio_file_path: str, task: str = "transcribe", 
                          api_key: str = None) -> tuple:
     """
-    转录音频文件并返回文本、VTT、SRT和语言信息
+    转录音频文件并返回文本、VTT、SRT、原始SRT、原始JSON和语言信息
     
     Args:
         audio_file_path: 音频文件路径
@@ -108,12 +111,18 @@ def transcribe_audio_file(audio_file_path: str, task: str = "transcribe",
         api_key: OpenAI API key
     
     Returns:
-        (text, vtt, srt, language)
+        (text, vtt, srt, raw_srt, raw_json, language)
     """
     results = transcribe_with_openai(audio_file_path, task=task, api_key=api_key)
     
     vtt = getSubs(results["segments"], "vtt", 45)
     srt = getSubs(results["segments"], "srt", 45)
+    raw_srt = getSubs(results["segments"], "raw_srt", None)
+    
+    # 导出原始JSON供调试
+    import json
+    raw_json = json.dumps(results, indent=2, ensure_ascii=False)
+    
     lang = results["language"]
     
-    return results["text"], vtt, srt, lang 
+    return results["text"], vtt, srt, raw_srt, raw_json, lang 
