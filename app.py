@@ -39,7 +39,7 @@ def split_text_at_punctuation(text: str) -> List[str]:
     
     return result
 
-def split_text_by_length(text: str, max_length: int = 45) -> List[str]:
+def split_text_by_length(text: str, max_length: int = 26) -> List[str]:
     """按长度分割文本，确保单词不被截断"""
     words = text.split()
     segments = []
@@ -67,7 +67,7 @@ def split_text_by_length(text: str, max_length: int = 45) -> List[str]:
     
     return segments
 
-def process_transcript_segments(segments, max_chars: int = 45) -> List[dict]:
+def process_transcript_segments(segments, max_chars: int = 26) -> List[dict]:
     """处理转录段落，按照指定规则分割"""
     processed_segments = []
     
@@ -228,7 +228,7 @@ def main():
             "每段字幕最大字符数",
             min_value=20,
             max_value=100,
-            value=45,
+            value=26,
             help="每个字幕段的最大字符数限制"
         )
     
@@ -381,8 +381,8 @@ def main():
                                     elif i == len(segment_words) - 1:
                                         should_split = True
                                     
-                                    # 3. 超过45个字符且有多个单词时，在上一个单词处分段
-                                    elif len(' '.join(current_words)) > 45 and len(current_words) > 1:
+                                    # 3. 超过26个字符且有多个单词时，在上一个单词处分段
+                                    elif len(' '.join(current_words)) > 26 and len(current_words) > 1:
                                         # 回退一个单词，在前面分段
                                         current_words.pop()
                                         current_timings.pop()
@@ -597,7 +597,7 @@ def main():
             - 使用 OpenAI Whisper 进行高质量语音转录
             - 智能字幕分段：
               - 在句号和感叹号后自动分段
-              - 每段最多45个字符（可调）
+              - 每段最多26个字符（可调）
               - 保持单词完整性
             - 生成两种SRT文件：
               - 标准字幕文件（优化后的段落）
