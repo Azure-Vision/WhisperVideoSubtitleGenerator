@@ -1,12 +1,11 @@
-ffmpeg==1.4
-ffmpeg_python==0.2.0
-numpy==1.23.3
+ffmpeg-python==0.2.0
+numpy
 pytubefix==6.13.0
-requests==2.32.3
+requests
 streamlit
 streamlit_lottie==0.0.3
-torch==2.4.0
-transformers==4.44.0
+torch
+transformers
 openai-whisper
 openai
 altair<5
