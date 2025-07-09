@@ -7,6 +7,12 @@ from datetime import timedelta
 from typing import List, Tuple
 from openai import OpenAI
 import ffmpeg
+import imageio_ffmpeg
+try:
+    from moviepy.editor import VideoFileClip
+    HAS_MOVIEPY = True
+except ImportError:
+    HAS_MOVIEPY = False
 
 def format_timestamp(seconds: float) -> str:
     """将秒数转换为SRT格式的时间戳"""
@@ -176,16 +182,74 @@ def extract_audio_from_video(video_file) -> str:
         video_temp_path = video_temp.name
     
     try:
+        # 获取ffmpeg路径并使用它
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        st.write(f"🔧 Using ffmpeg: {ffmpeg_exe}")
+        
+        # 检查ffmpeg是否可执行
+        if not os.path.exists(ffmpeg_exe):
+            raise FileNotFoundError(f"FFmpeg not found at: {ffmpeg_exe}")
+            
         # 使用ffmpeg提取音频
         stream = ffmpeg.input(video_temp_path)
         stream = ffmpeg.output(stream, audio_path, acodec='pcm_s16le', ar=16000)
-        ffmpeg.run(stream, quiet=True, overwrite_output=True)
+        ffmpeg.run(stream, cmd=ffmpeg_exe, quiet=True, overwrite_output=True)
         
         os.unlink(video_temp_path)
         return audio_path
     except Exception as e:
         if os.path.exists(video_temp_path):
             os.unlink(video_temp_path)
+        
+        # 备用方案：尝试系统ffmpeg
+        st.warning(f"⚠️ imageio-ffmpeg failed: {e}")
+        st.info("🔄 Trying system ffmpeg...")
+        
+        try:
+            with tempfile.NamedTemporaryFile(delete=False) as video_temp2:
+                video_file.seek(0)
+                video_temp2.write(video_file.read())
+                video_temp2_path = video_temp2.name
+            
+            stream = ffmpeg.input(video_temp2_path)
+            stream = ffmpeg.output(stream, audio_path, acodec='pcm_s16le', ar=16000)
+            ffmpeg.run(stream, quiet=True, overwrite_output=True)
+            
+            os.unlink(video_temp2_path)
+            st.success("✅ System ffmpeg worked!")
+            return audio_path
+            
+        except Exception as e2:
+            if os.path.exists(audio_path):
+                os.unlink(audio_path)
+            
+            # 最终备用方案：MoviePy
+            if HAS_MOVIEPY:
+                st.info("🎬 Trying MoviePy as final option...")
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False) as video_temp3:
+                        video_file.seek(0)
+                        video_temp3.write(video_file.read())
+                        video_temp3_path = video_temp3.name
+                    
+                    # 使用 MoviePy 提取音频
+                    video_clip = VideoFileClip(video_temp3_path)
+                    audio_clip = video_clip.audio
+                    audio_clip.write_audiofile(audio_path, verbose=False, logger=None)
+                    
+                    # 清理
+                    audio_clip.close()
+                    video_clip.close()
+                    os.unlink(video_temp3_path)
+                    
+                    st.success("✅ MoviePy worked!")
+                    return audio_path
+                    
+                except Exception as e3:
+                    raise Exception(f"All methods failed. imageio-ffmpeg: {e}, system ffmpeg: {e2}, moviepy: {e3}")
+            else:
+                raise Exception(f"Both ffmpeg methods failed. imageio-ffmpeg: {e}, system ffmpeg: {e2}")
+        
         raise e
 
 def main():
